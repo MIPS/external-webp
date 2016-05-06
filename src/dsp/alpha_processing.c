@@ -310,6 +310,7 @@ int (*WebPExtractAlpha)(const uint8_t*, int, int, int, uint8_t*, int);
 // Init function
 
 extern void WebPInitAlphaProcessingSSE2(void);
+extern void WebPInitAlphaProcessingMIPSdsp(void);
 
 static volatile VP8CPUInfo alpha_processing_last_cpuinfo_used =
     (VP8CPUInfo)&alpha_processing_last_cpuinfo_used;
@@ -328,6 +329,11 @@ void WebPInitAlphaProcessing(void) {
 #if defined(WEBP_USE_SSE2)
     if (VP8GetCPUInfo(kSSE2)) {
       WebPInitAlphaProcessingSSE2();
+    }
+#endif
+#if defined(WEBP_USE_MIPS_DSP_R1) || defined(WEBP_USE_MIPS_DSP_R2)
+    if (VP8GetCPUInfo(kMIPSdspR1) || VP8GetCPUInfo(kMIPSdspR2)) {
+      WebPInitAlphaProcessingMIPSdsp();
     }
 #endif
   }

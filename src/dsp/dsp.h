@@ -78,6 +78,13 @@ extern "C" {
 #if (__mips_isa_rev >= 2)
 #define WEBP_USE_MIPS32_R2
 #endif
+#if defined(__mips_dspr1) || (__mips_dsp_rev >= 1)
+#define WEBP_USE_MIPS_DSP_R1
+#if defined(__mips_dspr2) || (__mips_dsp_rev >= 2)
+#define WEBP_USE_MIPS_DSP_R1
+#define WEBP_USE_MIPS_DSP_R2
+#endif
+#endif
 #endif
 
 typedef enum {
@@ -86,7 +93,9 @@ typedef enum {
   kAVX,
   kAVX2,
   kNEON,
-  kMIPS32
+  kMIPS32,
+  kMIPSdspR1,
+  kMIPSdspR2
 } CPUFeature;
 // returns true if the CPU supports the feature.
 typedef int (*VP8CPUInfo)(CPUFeature feature);

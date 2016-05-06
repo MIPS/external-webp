@@ -687,6 +687,7 @@ VP8SimpleFilterFunc VP8SimpleHFilter16i;
 extern void VP8DspInitSSE2(void);
 extern void VP8DspInitNEON(void);
 extern void VP8DspInitMIPS32(void);
+extern void VP8DspInitMIPSdsp(void);
 
 static volatile VP8CPUInfo dec_last_cpuinfo_used =
     (VP8CPUInfo)&dec_last_cpuinfo_used;
@@ -729,6 +730,11 @@ void VP8DspInit(void) {
 #elif defined(WEBP_USE_MIPS32)
     if (VP8GetCPUInfo(kMIPS32)) {
       VP8DspInitMIPS32();
+    }
+#endif
+#if defined(WEBP_USE_MIPS_DSP_R1) || defined(WEBP_USE_MIPS_DSP_R2)
+    if (VP8GetCPUInfo(kMIPSdspR1) || VP8GetCPUInfo(kMIPSdspR2)) {
+      VP8DspInitMIPSdsp();
     }
 #endif
   }

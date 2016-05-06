@@ -122,6 +122,7 @@ WebPSamplerRowFunc WebPSamplers[MODE_LAST];
 
 extern void WebPInitSamplersSSE2(void);
 extern void WebPInitSamplersMIPS32(void);
+extern void WebPInitSamplersMIPSdsp(void);
 
 static volatile VP8CPUInfo yuv_last_cpuinfo_used =
     (VP8CPUInfo)&yuv_last_cpuinfo_used;
@@ -153,6 +154,11 @@ void WebPInitSamplers(void) {
       WebPInitSamplersMIPS32();
     }
 #endif  // WEBP_USE_MIPS32
+#if defined(WEBP_USE_MIPS_DSP_R1) || defined(WEBP_USE_MIPS_DSP_R2)
+    if (VP8GetCPUInfo(kMIPSdspR1) || VP8GetCPUInfo(kMIPSdspR2)) {
+      WebPInitSamplersMIPSdsp();
+    }
+#endif
   }
   yuv_last_cpuinfo_used = VP8GetCPUInfo;
 }
