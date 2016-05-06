@@ -1580,6 +1580,7 @@ VP8LHistogramAddFunc VP8LHistogramAdd;
 extern void VP8LDspInitSSE2(void);
 extern void VP8LDspInitNEON(void);
 extern void VP8LDspInitMIPS32(void);
+extern void VP8LDspInitMIPSdsp(void);
 
 void VP8LDspInit(void) {
   memcpy(VP8LPredictors, kPredictorsC, sizeof(VP8LPredictors));
@@ -1622,6 +1623,11 @@ void VP8LDspInit(void) {
 #if defined(WEBP_USE_MIPS32)
     if (VP8GetCPUInfo(kMIPS32)) {
       VP8LDspInitMIPS32();
+    }
+#endif
+#if defined(WEBP_USE_MIPS_DSP_R1) || defined(WEBP_USE_MIPS_DSP_R2)
+    if (VP8GetCPUInfo(kMIPSdspR1) || VP8GetCPUInfo(kMIPSdspR2)) {
+      VP8LDspInitMIPSdsp();
     }
 #endif
   }

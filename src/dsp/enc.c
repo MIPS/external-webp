@@ -691,6 +691,7 @@ extern void VP8EncDspInitSSE2(void);
 extern void VP8EncDspInitAVX2(void);
 extern void VP8EncDspInitNEON(void);
 extern void VP8EncDspInitMIPS32(void);
+extern void VP8EncDspInitMIPSdsp(void);
 
 void VP8EncDspInit(void) {
   VP8DspInit();  // common inverse transforms
@@ -734,6 +735,11 @@ void VP8EncDspInit(void) {
 #if defined(WEBP_USE_MIPS32)
     if (VP8GetCPUInfo(kMIPS32)) {
       VP8EncDspInitMIPS32();
+    }
+#endif
+#if defined(WEBP_USE_MIPS_DSP_R1) || defined(WEBP_USE_MIPS_DSP_R2)
+    if (VP8GetCPUInfo(kMIPSdspR1) || VP8GetCPUInfo(kMIPSdspR2)) {
+      VP8EncDspInitMIPSdsp();
     }
 #endif
   }
