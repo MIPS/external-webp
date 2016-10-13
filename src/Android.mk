@@ -34,12 +34,14 @@ LOCAL_SRC_FILES := \
         dsp/enc_avx2.c \
         dsp/enc_mips32.c \
         dsp/enc_mips_dsp_r2.c \
+        dsp/enc_msa.c \
         dsp/enc_neon.c \
         dsp/enc_sse2.c \
         dsp/enc_sse41.c \
         dsp/lossless_enc.c \
         dsp/lossless_enc_mips32.c \
         dsp/lossless_enc_mips_dsp_r2.c \
+        dsp/lossless_enc_msa.c \
         dsp/lossless_enc_neon.c \
         dsp/lossless_enc_sse2.c \
         dsp/lossless_enc_sse41.c \
@@ -115,23 +117,28 @@ LOCAL_SRC_FILES := \
         dsp/dec_clip_tables.c \
         dsp/dec_mips32.c \
         dsp/dec_mips_dsp_r2.c \
+        dsp/dec_msa.c \
         dsp/dec_neon.c \
         dsp/dec_sse2.c \
         dsp/dec_sse41.c \
         dsp/filters.c \
         dsp/filters_mips_dsp_r2.c \
+        dsp/filters_msa.c \
         dsp/filters_sse2.c \
         dsp/lossless.c \
         dsp/lossless_mips_dsp_r2.c \
+        dsp/lossless_msa.c \
         dsp/lossless_neon.c \
         dsp/lossless_sse2.c \
         dsp/rescaler.c \
         dsp/rescaler_mips32.c \
         dsp/rescaler_mips_dsp_r2.c \
+        dsp/rescaler_msa.c \
         dsp/rescaler_neon.c \
         dsp/rescaler_sse2.c \
         dsp/upsampling.c \
         dsp/upsampling_mips_dsp_r2.c \
+        dsp/upsampling_msa.c \
         dsp/upsampling_neon.c \
         dsp/upsampling_sse2.c \
         dsp/yuv.c \

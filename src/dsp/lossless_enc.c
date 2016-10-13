@@ -1154,6 +1154,7 @@ extern void VP8LEncDspInitSSE41(void);
 extern void VP8LEncDspInitNEON(void);
 extern void VP8LEncDspInitMIPS32(void);
 extern void VP8LEncDspInitMIPSdspR2(void);
+extern void VP8LEncDspInitMSA(void);
 
 static volatile VP8CPUInfo lossless_enc_last_cpuinfo_used =
     (VP8CPUInfo)&lossless_enc_last_cpuinfo_used;
