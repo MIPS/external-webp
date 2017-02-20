@@ -222,6 +222,7 @@ static void TransformAC3(const int16_t* in, uint8_t* dst) {
   const v16i8 cnst4b = __msa_ldi_b(4);                        \
   const v16i8 cnst3b = __msa_ldi_b(3);                        \
   const v8i16 cnst9h = __msa_ldi_h(9);                        \
+  const v8i16 cnst63h = __msa_ldi_h(63);                      \
                                                               \
   FLIP_SIGN4(p1, p0, q0, q1, p1_m, p0_m, q0_m, q1_m);         \
   filt = __msa_subs_s_b(p1_m, q1_m);                          \
@@ -241,9 +242,9 @@ static void TransformAC3(const int16_t* in, uint8_t* dst) {
   ILVRL_B2_SH(filt_sign, filt, filt_r, filt_l);               \
   /* update q2/p2 */                                          \
   temp0 = filt_r * cnst9h;                                    \
-  temp1 = ADDVI_H(temp0, 63);                                 \
+  temp1 = temp0 + cnst63h;                                    \
   temp2 = filt_l * cnst9h;                                    \
-  temp3 = ADDVI_H(temp2, 63);                                 \
+  temp3 = temp2 + cnst63h;                                    \
   FILT2(q2_m, p2_m, q2, p2);                                  \
   /* update q1/p1 */                                          \
   temp1 = temp1 + temp0;                                      \
@@ -357,7 +358,7 @@ static void VFilter16(uint8_t* src, int stride,
 
 static void HFilter16(uint8_t* src, int stride,
                       int b_limit_in, int limit_in, int thresh_in) {
-  uint8_t* ptmp  = src - 4;
+  uint8_t* ptmp = src - 4;
   v16u8 p3, p2, p1, p0, q3, q2, q1, q0;
   v16u8 mask, hev;
   v16u8 row0, row1, row2, row3, row4, row5, row6, row7, row8;
@@ -449,8 +450,9 @@ static void HFilterVertEdge16i(uint8_t* src, int stride,
   const v16u8 b_limit0 = (v16u8)__msa_fill_b(b_limit);
   const v16u8 limit0 = (v16u8)__msa_fill_b(limit);
 
-  LD_UB8(src - 4, stride, row0, row1, row2, row3, row4, row5, row6, row7);
-  LD_UB8(src - 4 + (8 * stride), stride,
+  src -= 4;
+  LD_UB8(src, stride, row0, row1, row2, row3, row4, row5, row6, row7);
+  LD_UB8(src + (8 * stride), stride,
          row8, row9, row10, row11, row12, row13, row14, row15);
   TRANSPOSE16x8_UB_UB(row0, row1, row2, row3, row4, row5, row6, row7,
                       row8, row9, row10, row11, row12, row13, row14, row15,
