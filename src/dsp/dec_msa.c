@@ -222,6 +222,7 @@ static void TransformAC3(const int16_t* in, uint8_t* dst) {
   const v16i8 cnst4b = __msa_ldi_b(4);                        \
   const v16i8 cnst3b = __msa_ldi_b(3);                        \
   const v8i16 cnst9h = __msa_ldi_h(9);                        \
+  const v8i16 cnst63h = __msa_ldi_h(63);                      \
                                                               \
   FLIP_SIGN4(p1, p0, q0, q1, p1_m, p0_m, q0_m, q1_m);         \
   filt = __msa_subs_s_b(p1_m, q1_m);                          \
@@ -241,9 +242,9 @@ static void TransformAC3(const int16_t* in, uint8_t* dst) {
   ILVRL_B2_SH(filt_sign, filt, filt_r, filt_l);               \
   /* update q2/p2 */                                          \
   temp0 = filt_r * cnst9h;                                    \
-  temp1 = ADDVI_H(temp0, 63);                                 \
+  temp1 = temp0 + cnst63h;                                    \
   temp2 = filt_l * cnst9h;                                    \
-  temp3 = ADDVI_H(temp2, 63);                                 \
+  temp3 = temp2 + cnst63h;                                    \
   FILT2(q2_m, p2_m, q2, p2);                                  \
   /* update q1/p1 */                                          \
   temp1 = temp1 + temp0;                                      \
@@ -357,7 +358,7 @@ static void VFilter16(uint8_t* src, int stride,
 
 static void HFilter16(uint8_t* src, int stride,
                       int b_limit_in, int limit_in, int thresh_in) {
-  uint8_t* ptmp;
+  uint8_t* ptmp = src - 4;
   v16u8 p3, p2, p1, p0, q3, q2, q1, q0;
   v16u8 mask, hev;
   v16u8 row0, row1, row2, row3, row4, row5, row6, row7, row8;
@@ -366,21 +367,6 @@ static void HFilter16(uint8_t* src, int stride,
   const v16u8 b_limit = (v16u8)__msa_fill_b(b_limit_in);
   const v16u8 limit = (v16u8)__msa_fill_b(limit_in);
   const v16u8 thresh = (v16u8)__msa_fill_b(thresh_in);
-
-#ifdef CLANG_BUILD
-  asm volatile (
-  #if (__mips == 64)
-    "daddiu  %[ptmp],  %[src], -4  \n\t"
-  #else
-    "addiu  %[ptmp],  %[src], -4  \n\t"
-  #endif
-  
-    : [ptmp] "=r" (ptmp)
-    : [src] "r" (src)
-  );
-#else
-  ptmp = src - 4;
-#endif
 
   LD_UB8(ptmp, stride, row0, row1, row2, row3, row4, row5, row6, row7);
   ptmp += (8 * stride);
@@ -464,20 +450,7 @@ static void HFilterVertEdge16i(uint8_t* src, int stride,
   const v16u8 b_limit0 = (v16u8)__msa_fill_b(b_limit);
   const v16u8 limit0 = (v16u8)__msa_fill_b(limit);
 
-#ifdef CLANG_BUILD
-  asm volatile (
-  #if (__mips == 64)
-    "daddiu  %[src],  %[src], -4  \n\t"
-  #else
-    "addiu  %[src],  %[src], -4  \n\t"
-  #endif
-  
-    : [src] "+r" (src)
-  );
-#else
   src -= 4;
-#endif
-
   LD_UB8(src, stride, row0, row1, row2, row3, row4, row5, row6, row7);
   LD_UB8(src + (8 * stride), stride,
          row8, row9, row10, row11, row12, row13, row14, row15);
@@ -552,8 +525,8 @@ static void VFilter8(uint8_t* src_u, uint8_t* src_v, int stride,
 
 static void HFilter8(uint8_t* src_u, uint8_t* src_v, int stride,
                      int b_limit_in, int limit_in, int thresh_in) {
-  uint8_t* ptmp_src_u;
-  uint8_t* ptmp_src_v;
+  uint8_t* ptmp_src_u = src_u - 4;
+  uint8_t* ptmp_src_v = src_v - 4;
   v16u8 p3, p2, p1, p0, q3, q2, q1, q0, mask, hev;
   v16u8 row0, row1, row2, row3, row4, row5, row6, row7, row8;
   v16u8 row9, row10, row11, row12, row13, row14, row15;
@@ -561,24 +534,6 @@ static void HFilter8(uint8_t* src_u, uint8_t* src_v, int stride,
   const v16u8 b_limit = (v16u8)__msa_fill_b(b_limit_in);
   const v16u8 limit = (v16u8)__msa_fill_b(limit_in);
   const v16u8 thresh = (v16u8)__msa_fill_b(thresh_in);
-
-#ifdef CLANG_BUILD
-  asm volatile (
-  #if (__mips == 64)
-    "daddiu  %[ptmp_src_u],  %[src_u], -4  \n\t"
-    "daddiu  %[ptmp_src_v],  %[src_v], -4  \n\t"
-  #else
-    "addiu  %[ptmp_src_u],  %[src_u], -4  \n\t"
-    "addiu  %[ptmp_src_v],  %[src_v], -4  \n\t"
-  #endif
-
-    : [ptmp_src_u] "=r" (ptmp_src_u), [ptmp_src_v] "=r" (ptmp_src_v)
-    : [src_u] "r" (src_u), [src_v] "r" (src_v)
-  );
-#else
-  ptmp_src_u = src_u - 4;
-  ptmp_src_v = src_v - 4;
-#endif
 
   LD_UB8(ptmp_src_u, stride, row0, row1, row2, row3, row4, row5, row6, row7);
   LD_UB8(ptmp_src_v, stride,
@@ -683,22 +638,7 @@ static void SimpleHFilter16(uint8_t* src, int stride, int b_limit_in) {
   v16u8 row8, row9, row10, row11, row12, row13, row14, row15;
   v8i16 tmp0, tmp1;
   const v16u8 b_limit = (v16u8)__msa_fill_b(b_limit_in);
-  uint8_t* ptemp_src;
-
-#ifdef CLANG_BUILD
-  asm volatile (
-  #if (__mips == 64)
-    "daddiu  %[ptemp_src],  %[src], -2  \n\t"
-  #else
-    "addiu  %[ptemp_src],  %[src], -2  \n\t"
-  #endif
-
-    : [ptemp_src] "=r" (ptemp_src)
-    : [src] "r" (src)
-  );
-#else
-  ptemp_src = src - 2;
-#endif
+  uint8_t* ptemp_src = src - 2;
 
   LD_UB8(ptemp_src, stride, row0, row1, row2, row3, row4, row5, row6, row7);
   LD_UB8(ptemp_src + 8 * stride, stride,

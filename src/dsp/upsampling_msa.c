@@ -375,7 +375,7 @@ static void YuvToBgrLine(const uint8_t* y, const uint8_t* u,
 static void YuvToRgbaLine(const uint8_t* y, const uint8_t* u,
                           const uint8_t* v, uint8_t* dst, int length) {
   v16u8 R, G, B;
-  const v16u8 A = (v16u8)__msa_ldi_b(0xff);
+  const v16u8 A = (v16u8)__msa_ldi_b(-1);
   while (length >= 16) {
     CALC_RGB16(y, u, v, R, G, B);
     STORE16_4(R, G, B, A, dst);
@@ -403,7 +403,7 @@ static void YuvToRgbaLine(const uint8_t* y, const uint8_t* u,
 static void YuvToBgraLine(const uint8_t* y, const uint8_t* u,
                           const uint8_t* v, uint8_t* dst, int length) {
   v16u8 R, G, B;
-  const v16u8 A = (v16u8)__msa_ldi_b(0xff);
+  const v16u8 A = (v16u8)__msa_ldi_b(-1);
   while (length >= 16) {
     CALC_RGB16(y, u, v, R, G, B);
     STORE16_4(B, G, R, A, dst);
@@ -431,7 +431,7 @@ static void YuvToBgraLine(const uint8_t* y, const uint8_t* u,
 static void YuvToArgbLine(const uint8_t* y, const uint8_t* u,
                           const uint8_t* v, uint8_t* dst, int length) {
   v16u8 R, G, B;
-  const v16u8 A = (v16u8)__msa_ldi_b(0xff);
+  const v16u8 A = (v16u8)__msa_ldi_b(-1);
   while (length >= 16) {
     CALC_RGB16(y, u, v, R, G, B);
     STORE16_4(A, R, G, B, dst);
